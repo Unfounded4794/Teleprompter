@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101118">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="description" content="An offline teleprompter for rehearsals and recording.">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <title>Teleprompter</title>
+</head>
+<body>
+  <header class="topbar studio-only">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="Teleprompter home"><img src="/icon.svg" alt="" width="36" height="36"><span>Teleprompter</span></a>
+      <div class="top-actions">
+        <button id="offline-info" class="status-pill" type="button"><span class="status-dot"></span><span id="offline-label">Preparing offline</span></button>
+        <button id="open-settings" class="button icon-button quiet" type="button" aria-label="Settings" title="Settings"><i data-icon="settings2"></i></button>
+        <button id="open-display" class="button outline" type="button" aria-label="Start presenting"><i data-icon="maximize2"></i><span>Start presenting</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace" id="workspace">
+    <div class="workspace-heading studio-only">
+      <h1>Prompting studio</h1>
+      <div class="display-actions">
+        <span id="workspace-role" class="device-role" hidden>Operator</span>
+        <button id="second-monitor" class="button quiet share-button" type="button" title="Open a separate prompter window for an extended display"><i data-icon="monitor"></i><span>Second monitor</span></button>
+        <button id="share-display" class="button quiet share-button" type="button"><i data-icon="radio"></i><span>Connect displays</span></button>
+      </div>
+    </div>
+
+    <section class="panel studio-panel" id="script-panel" aria-label="Script and prompter">
+      <div class="panel-header workspace-toolbar studio-only">
+        <div class="segmented" role="group" aria-label="Workspace view">
+          <button id="edit-tab" type="button" aria-pressed="true">Edit script</button>
+          <button id="prompt-tab" type="button" aria-pressed="false">Prompter</button>
+        </div>
+          <div class="script-actions">
+            <button id="new-script" class="button icon-button quiet" type="button" aria-label="New script" title="New script"><i data-icon="file-plus2"></i></button>
+            <button id="export-script" class="button icon-button quiet" type="button" aria-label="Save a copy as HTML" title="Save a copy as HTML"><i data-icon="download"></i></button>
+            <button id="import-script" class="button outline compact" type="button"><i data-icon="upload"></i><span>Import</span></button>
+            <input id="file-input" type="file" accept=".txt,.md,.markdown,.docx,.pdf,.rtf,.html,.htm,text/plain,application/pdf" hidden>
+          </div>
+      </div>
+      <div class="studio-only script-title-row">
+          <input id="script-title" class="script-title" aria-label="Script title" maxlength="150" placeholder="Untitled script">
+      </div>
+      <div class="script-panel studio-only" id="edit-view">
+        <div class="script-content">
+          <div class="editor-surface">
+            <div class="editor-toolbar" role="toolbar" aria-label="Script formatting">
+              <label class="select-wrap"><span class="sr-only">Selection font</span><select id="edit-font" aria-label="Selection font">
+                <option value="" selected>Font</option><option value="Arial">Sans serif</option><option value="Georgia">Serif</option><option value="Courier New">Monospace</option>
+              </select><i data-icon="chevron-down"></i></label>
+              <label class="select-wrap size-select"><span class="sr-only">Selection size</span><select id="edit-size" aria-label="Selection size">
+                <option value="" selected>Size</option><option value="2">Small</option><option value="3">Normal</option><option value="4">Large</option><option value="5">Extra large</option>
+              </select><i data-icon="chevron-down"></i></label>
+              <span class="toolbar-divider"></span>
+              <button class="format-button" data-format="bold" type="button" aria-label="Bold" title="Bold"><i data-icon="bold"></i></button>
+              <button class="format-button" data-format="italic" type="button" aria-label="Italic" title="Italic"><i data-icon="italic"></i></button>
+              <button class="format-button" data-format="underline" type="button" aria-label="Underline" title="Underline"><i data-icon="underline"></i></button>
+              <span class="toolbar-divider"></span>
+              <button class="format-button" data-format="insertUnorderedList" type="button" aria-label="Bullet list" title="Bullet list"><i data-icon="list"></i></button>
+              <button class="format-button" data-format="undo" type="button" aria-label="Undo" title="Undo"><i data-icon="undo2"></i></button>
+            </div>
+            <div id="editor" contenteditable="true" role="textbox" aria-label="Script text" aria-multiline="true" spellcheck="true" data-placeholder="Paste or type your script…"></div>
+            <div class="editor-footer">
+              <span id="word-count">0 words</span>
+              <span id="save-state"><i data-icon="check"></i><span id="save-label">Saved on this device</span></span>
+            </div>
+          </div>
+          <button id="drop-zone" class="drop-zone" type="button">
+            <span class="drop-icon"><i data-icon="file-up"></i></span>
+            <span><b>Drop a script here or browse files</b><small>TXT, Markdown, Word, PDF, RTF</small></span>
+            <i class="drop-arrow" data-icon="arrow-up-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="monitor-panel" id="prompt-view" hidden>
+        <div class="monitor-content">
+          <div class="preview-dock">
+          <div class="stage" id="stage" tabindex="0" aria-label="Prompter preview">
+            <button id="back-to-script" class="button stage-back" type="button">← Back to workspace</button>
+            <span id="stage-role" class="device-role" hidden></span>
+            <div class="stage-meta"><span id="stage-status" class="stage-status"><span></span><span id="stage-label">READY</span></span><span id="stage-position">00:00</span></div>
+            <div class="reading-area" id="reading-area">
+              <div class="prompt-motion" id="prompt-motion"><div class="prompt-copy" id="prompt-copy"></div></div>
+            </div>
+            <div class="stage-shade" aria-hidden="true"></div>
+            <div class="guide" id="guide" aria-hidden="true"><span></span><b></b><span></span></div>
+            <div class="display-bar">
+              <span id="display-status" role="status">Waiting for the operator’s script…</span>
+              <button id="expanded-play" class="button icon-button quiet play-button" type="button" aria-label="Start prompting" title="Start prompting"><i class="play-icon" data-icon="play"></i><i class="pause-icon" data-icon="pause"></i></button>
+              <button id="display-flip-x" class="button icon-button quiet" type="button" aria-label="Flip horizontally" title="Flip horizontally"><i data-icon="flip-horizontal2"></i></button>
+              <button id="display-flip-y" class="button icon-button quiet" type="button" aria-label="Flip vertically" title="Flip vertically"><i data-icon="flip-vertical2"></i></button>
+              <button id="display-fullscreen" class="button icon-button quiet" type="button" aria-label="Full screen" title="Full screen"><i data-icon="maximize2"></i></button>
+              <button id="exit-expanded" class="button icon-button quiet" type="button" aria-label="Exit expanded view" title="Exit expanded view"><i data-icon="minimize2"></i></button>
+            </div>
+          </div>
+
+          <div class="progress-row studio-only">
+            <span id="current-time">00:00</span>
+            <input id="seek" type="range" min="0" max="1" step="0.05" value="0" aria-label="Script position">
+            <span id="duration">00:00</span>
+          </div>
+          <div class="transport studio-only">
+            <div class="transport-side">
+              <button id="restart" class="button icon-button quiet" type="button" aria-label="Restart script" title="Restart script"><i data-icon="rotate-ccw"></i></button>
+              <button id="previous" class="button icon-button quiet" type="button" aria-label="Previous paragraph" title="Previous paragraph"><i data-icon="skip-back"></i></button>
+            </div>
+            <button id="play" class="button primary play-button" type="button">
+              <i class="play-icon" data-icon="play"></i><i class="pause-icon" data-icon="pause"></i><span id="play-label">Start prompting</span>
+            </button>
+            <div class="transport-side end">
+              <button id="next" class="button icon-button quiet" type="button" aria-label="Next paragraph" title="Next paragraph"><i data-icon="skip-forward"></i></button>
+            </div>
+          </div>
+          </div>
+
+          <div class="monitor-settings studio-only">
+            <div class="mode-row">
+              <div class="segmented" role="group" aria-label="Prompting mode">
+                <button id="timed-mode" type="button" aria-pressed="true"><i data-icon="timer"></i>Timed</button>
+                <button id="voice-mode" type="button" aria-pressed="false"><i data-icon="audio-lines"></i>Voice follow</button>
+              </div>
+              <div class="flip-actions" role="group" aria-label="Preview orientation">
+                <button id="flip-x" class="button icon-button outline" type="button" aria-pressed="false" aria-label="Flip preview horizontally" title="Flip preview horizontally"><i data-icon="flip-horizontal2"></i></button>
+                <button id="flip-y" class="button icon-button outline" type="button" aria-pressed="false" aria-label="Flip preview vertically" title="Flip preview vertically"><i data-icon="flip-vertical2"></i></button>
+              </div>
+            </div>
+            <div id="timed-controls" class="speed-control">
+              <label for="speed"><i data-icon="gauge"></i>Scroll speed</label>
+              <input id="speed" type="range" min="5" max="1200" step="1" value="40">
+              <output id="speed-value" for="speed">40 <small>px/s</small></output>
+            </div>
+            <div id="voice-controls" class="voice-controls" hidden>
+              <div class="voice-options">
+                <label><span>Speech language</span><select id="voice-language"><option value="en">English</option><option value="hu">Magyar</option></select></label>
+                <label><span>Local model</span><select id="voice-model"><option value="live-en">Live English (streaming)</option><option value="tiny">Lightweight</option><option value="base">Compact</option><option value="small">Balanced</option><option value="turbo">High accuracy</option></select></label>
+              </div>
+              <div id="english-follow-options" class="voice-options" hidden>
+                <label><span>Follow style</span><select id="voice-follow-style">
+                  <option value="match">Word match</option><option value="predictive">Predictive (v0.5.3)</option><option value="paced">Paced (v0.5.4)</option>
+                </select></label>
+                <div id="word-lead-control" class="live-field word-lead">
+                  <label for="word-lead">Word lead</label>
+                  <div><input id="word-lead" type="range" min="0" max="6" step="1" value="1" aria-describedby="word-lead-note"><output id="word-lead-value" for="word-lead">1</output></div>
+                  <small id="word-lead-note">0 cues the last matched word. 1 cues the next word.</small>
+                </div>
+              </div>
+              <div class="voice-setup"><button id="prepare-voice" class="button outline compact" type="button"><i data-icon="download"></i><span>Prepare on this device</span></button><span id="voice-status" role="status">Prepare a model over local Wi‑Fi before you go offline.</span></div>
+              <div id="microphone-feedback" class="microphone-feedback" hidden><meter id="mic-level" min="0" max="1" value="0" aria-label="Microphone level"></meter><span id="voice-heard"></span></div>
+              <p id="voice-recovery" class="voice-note" role="status" hidden></p>
+            </div>
+          </div>
+          <details class="guide-controls studio-only" open>
+            <summary>Reading guide and text layout</summary>
+            <div class="guide-controls-inner">
+      <div class="guide-options">
+        <label class="checkbox-label"><input id="show-guide" type="checkbox"> Show reading guide</label>
+        <label class="checkbox-label"><input id="highlight-words" type="checkbox"> Highlight words</label>
+        <label class="checkbox-label"><input id="voice-scroll" type="checkbox"> Continuous voice scrolling</label>
+      </div>
+      <div class="field-grid display-fields">
+        <div class="live-field"><label for="prompt-size">Text size (px)</label><div><input id="prompt-size-range" type="range" min="20" max="160" step="1" aria-label="Text size slider"><input id="prompt-size" type="number" min="20" max="160" step="1"></div></div>
+        <label class="font-field"><span>Font</span><select id="prompt-font"><option value="sans">Inter</option><option value="serif">Georgia</option><option value="mono">Monospace</option></select></label>
+        <label><span>Surrounding text</span><select id="shade-mode"><option value="gradient">Gradient fade</option><option value="mask">Black mask</option><option value="none">Show all text</option></select></label>
+        <div class="live-field"><label for="shade-opacity">Darkening opacity (%)</label><div><input id="shade-opacity-range" type="range" min="0" max="100" step="5" aria-label="Darkening opacity (%) slider"><input id="shade-opacity" type="number" min="0" max="100" step="5" aria-label="Darkening opacity (%)"></div></div>
+        <div class="live-field"><label for="focus-lines">Visible lines around guide</label><div><input id="focus-lines-range" type="range" min="1" max="12" step="0.5" aria-label="Visible lines around guide slider"><input id="focus-lines" type="number" min="1" max="12" step="0.5" aria-label="Visible lines around guide"></div></div>
+        <div class="live-field"><label for="guide-thickness">Guide line thickness (px)</label><div><input id="guide-thickness-range" type="range" min="0" max="8" step="0.5" aria-label="Guide line thickness (px) slider"><input id="guide-thickness" type="number" min="0" max="8" step="0.5" aria-label="Guide line thickness (px)"></div></div>
+        <div class="live-field"><label for="arrow-size">Arrow size (px)</label><div><input id="arrow-size-range" type="range" min="0" max="28" step="1" aria-label="Arrow size (px) slider"><input id="arrow-size" type="number" min="0" max="28" step="1" aria-label="Arrow size (px)"></div></div>
+        <div class="live-field"><label for="reading-y">Reading height (%)</label><div><input id="reading-y-range" type="range" min="10" max="90" step="1" aria-label="Reading height (%) slider"><input id="reading-y" type="number" min="10" max="90" step="1" aria-label="Reading height (%)"></div></div>
+        <div class="live-field"><label for="margin-left">Left margin (%)</label><div><input id="margin-left-range" type="range" min="0" max="40" step="1" aria-label="Left margin slider"><input id="margin-left" type="number" min="0" max="40" step="1" aria-label="Left margin (%)"></div></div>
+        <div class="live-field"><label for="margin-right">Right margin (%)</label><div><input id="margin-right-range" type="range" min="0" max="40" step="1" aria-label="Right margin slider"><input id="margin-right" type="number" min="0" max="40" step="1" aria-label="Right margin (%)"></div></div>
+        <div class="live-field"><label for="reading-x">Horizontal reading offset (%)</label><div><input id="reading-x-range" type="range" min="-25" max="25" step="1" aria-label="Horizontal reading offset (%) slider"><input id="reading-x" type="number" min="-25" max="25" step="1" aria-label="Horizontal reading offset (%)"></div></div>
+        <div id="voice-line-offset-control" class="live-field" hidden><label for="voice-line-offset">Voice offset (lines)</label><div><input id="voice-line-offset-range" type="range" min="-2" max="2" step="0.25" value="0" aria-label="Voice line offset slider"><input id="voice-line-offset" type="number" min="-2" max="2" step="0.25" value="0"></div></div>
+        <div id="voice-scroll-smoothing-control" class="live-field" hidden><label for="voice-scroll-smoothing">Scroll smoothing (%)</label><div><input id="voice-scroll-smoothing-range" type="range" min="0" max="100" step="1" value="60" aria-label="Scroll smoothing slider"><input id="voice-scroll-smoothing" type="number" min="0" max="100" step="1" value="60"></div></div>
+      </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+    <footer class="workspace-footer studio-only">
+      <span><kbd id="play-hint">Space</kbd> Play / pause <span class="hint-gap"></span><kbd id="slower-hint">↓</kbd> <kbd id="faster-hint">↑</kbd> Speed</span>
+      <button id="footer-settings" class="text-button" type="button"><i data-icon="settings2"></i>Settings</button>
+      <button id="app-version" class="text-button app-version" type="button" aria-label="Teleprompter version %APP_VERSION% and offline status">v%APP_VERSION%</button>
+    </footer>
+  </main>
+
+  <dialog id="settings-dialog">
+    <div class="dialog-title"><h2>Settings</h2><button class="button icon-button quiet" data-close type="button" aria-label="Close settings"><i data-icon="x"></i></button></div>
+    <div class="dialog-content">
+      <label class="checkbox-label"><input id="tap-pause" type="checkbox"> Tap full-screen text to play or pause</label>
+      <p>Drag the full-screen text to move backward or forward. Dragging pauses timed scrolling.</p>
+      <h3>Playback controls</h3>
+      <div class="field-grid shortcuts-bottom">
+        <label><span>Hold-to-slow speed (px/s)</span><input id="slow-speed" type="number" min="5" max="1200" step="1"></label>
+        <label><span>Mouse wheel</span><select id="wheel-action"><option value="speed">Adjust speed</option><option value="off">Off</option></select></label>
+        <label><span>Wheel step (px/s)</span><input id="wheel-step" type="number" min="1" max="200" step="1"></label>
+      </div>
+      <h3>Keyboard shortcuts</h3>
+      <p>Press a key or a button on a paired keyboard-style remote to bind it.</p>
+      <div id="shortcut-list" class="shortcut-list"></div>
+      <button id="reset-shortcuts" class="text-button" type="button">Restore default shortcuts</button>
+      <p id="shortcut-status" role="status"></p>
+    </div>
+  </dialog>
+
+  <dialog id="pair-dialog">
+    <div class="dialog-title"><h2>Connect displays</h2><button class="button icon-button quiet" data-close type="button" aria-label="Close pairing"><i data-icon="x"></i></button></div>
+    <div class="dialog-content">
+      <div class="segmented pairing-roles" role="group" aria-label="This device’s role">
+        <button id="pair-control-role" type="button" aria-pressed="true">Operator</button>
+        <button id="pair-display-role" type="button" aria-pressed="false">Display</button>
+      </div>
+      <section id="pair-control-panel" class="pair-role">
+      <p><strong>This device is the operator.</strong> It runs the script and playback. On the other device, open Teleprompter and select Connect displays → Display. Both devices need the same local network.</p>
+      <button id="start-pair" class="button primary" type="button">Start pairing</button>
+      <div id="pair-code-row" hidden><span>Pairing code</span><output id="pair-code"></output></div>
+      <div id="pair-status" role="status"></div>
+      <details id="pair-link-details" hidden><summary>Link and QR code for browser setup</summary><div class="pair-role">
+      <img id="pair-qr" alt="QR code for the display link" width="180" height="180" hidden>
+      <label class="pair-link" for="pair-url">Display link</label>
+      <div class="pair-controls"><input id="pair-url" type="url" readonly><button id="copy-pair" class="button outline" type="button">Copy</button></div>
+      </div></details>
+      <button id="retry-pair" class="button outline" type="button" hidden>Retry connection</button>
+      <button id="stop-pair" class="text-button" type="button" hidden>End pairing</button>
+      </section>
+      <section id="pair-display-panel" class="pair-role" hidden>
+        <p><strong>This device is the display.</strong> It shows the script from the operator. Enter the code shown on the operator’s device. On iPhone or iPad, do this from the Home Screen app.</p>
+        <form id="join-pair" class="pair-role">
+          <label class="pair-link" for="join-code">Pairing code</label>
+          <input id="join-code" type="text" minlength="10" maxlength="15" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+          <button class="button primary" type="submit">Join as display</button>
+        </form>
+        <p id="join-status" role="status"></p>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="offline-dialog">
+    <div class="dialog-title"><h2>Offline setup</h2><button class="button icon-button quiet" data-close type="button" aria-label="Close offline setup"><i data-icon="x"></i></button></div>
+    <div class="dialog-content">
+      <p id="offline-detail"></p>
+      <p class="app-version">Teleprompter v%APP_VERSION%</p>
+      <button id="apply-update" class="button primary" type="button" hidden>Use updated app</button>
+      <p>To test before a shoot, close the app, turn off Wi‑Fi and cellular, and open it again from the Home Screen. Voice follow requires a model prepared on this device. Paired devices need local Wi‑Fi while they’re connected.</p>
+      <button class="button primary" data-close type="button">Done</button>
+    </div>
+  </dialog>
+
+  <dialog id="replace-dialog">
+    <form method="dialog">
+      <div class="dialog-title"><h2 id="replace-title">Replace the current script?</h2><button class="button icon-button quiet" value="cancel" aria-label="Cancel"><i data-icon="x"></i></button></div>
+      <div class="dialog-content"><p id="replace-detail">Save a copy first if you want to keep this script.</p>
+        <div class="replace-actions"><button class="button outline" value="cancel">Cancel</button><button class="button primary" value="replace">Replace script</button></div>
+      </div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

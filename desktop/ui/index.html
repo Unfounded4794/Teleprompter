@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <title>Teleprompter Setup</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand"><img src="/icon.svg" width="38" height="38" alt=""><div><strong>Teleprompter</strong><span>Desktop setup</span></div></div>
+    <div class="badge" id="connection"><span class="dot"></span><span id="connection-text">Starting</span></div>
+  </header>
+  <main>
+    <section class="card desktop" aria-labelledby="desktop-title">
+      <div class="card-header">
+        <div><h1 id="desktop-title">This computer</h1><p>Open the editor and prompter in your browser.</p></div>
+        <button id="open-desktop" class="button primary" type="button" disabled>Open Teleprompter <span aria-hidden="true">↗</span></button>
+        <button id="retry-desktop" class="button outline" type="button" hidden>Retry</button>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="phone-title">
+      <div class="card-header">
+        <div><h2 id="phone-title">iPhone or iPad</h2><p>Install over your local Wi-Fi, then use it offline.</p></div>
+        <button id="phone-toggle" class="button outline" type="button">Start phone setup</button>
+      </div>
+      <div id="phone-details" class="phone-details" hidden>
+        <div class="qr-wrap"><img id="qr-code" width="148" height="148" alt="Scan with the phone camera to open the local setup page"></div>
+        <div class="phone-instructions">
+          <p>Connect to the same local network and scan the code with the phone’s camera. Safari will walk you through adding Teleprompter to the Home Screen.</p>
+          <label id="network-field">Network address
+            <select id="network" aria-label="Network address"></select>
+          </label>
+          <label class="visually-hidden" for="setup-url">Phone setup link</label>
+          <div class="copy-row"><input id="setup-url" type="text" readonly><button id="copy" class="button outline" type="button">Copy link</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card models" aria-labelledby="models-title">
+      <div class="card-header">
+        <div><h2 id="models-title">Offline voice models</h2><p>Prepare on this computer, then copy to your phone in the app.</p></div>
+        <button id="import-models" class="button outline" type="button">Import from folder</button>
+      </div>
+      <div id="models" class="model-list"></div>
+      <div id="download-state" role="status" hidden></div>
+    </section>
+    <div id="feedback" class="feedback" role="status" hidden></div>
+    <footer id="keep-open">Keep this window open while installing or using a paired display.</footer>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

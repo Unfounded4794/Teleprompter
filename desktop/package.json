@@ -1,0 +1,92 @@
+{
+  "name": "teleprompter-setup",
+  "productName": "Teleprompter Setup",
+  "version": "0.5.5",
+  "private": true,
+  "description": "Offline desktop launcher and phone setup for Teleprompter",
+  "author": "Teleprompter",
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-builder --publish never",
+    "package:windows": "electron-builder --win nsis --x64 --publish never",
+    "package:mac": "electron-builder --mac dmg --arm64 --x64 --publish never",
+    "package:linux": "electron-builder --linux AppImage --x64 --publish never",
+    "archive": "node ../scripts/desktop-archive.mjs"
+  },
+  "dependencies": {
+    "node-forge": "1.4.3",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@electron/asar": "^4.3.2",
+    "@electron/get": "^5.1.0",
+    "electron": "45.3.3",
+    "electron-builder": "26.18.0",
+    "jszip": "^3.10.2",
+    "plist": "^5.1.1"
+  },
+  "build": {
+    "appId": "local.teleprompter.setup",
+    "directories": {
+      "output": "../release"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "certificates.cjs",
+      "ui/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist",
+        "to": "teleprompter/dist"
+      },
+      {
+        "from": "../server.mjs",
+        "to": "teleprompter/server.mjs"
+      },
+      {
+        "from": "../.local/models/base",
+        "to": "teleprompter/bundled-models/base"
+      },
+      {
+        "from": "../.local/models/tiny",
+        "to": "teleprompter/bundled-models/tiny"
+      },
+      {
+        "from": "../scripts",
+        "to": "teleprompter/scripts",
+        "filter": [
+          "local-network.mjs",
+          "prepare-voice.mjs",
+          "lan-profile.mjs"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "../public/icon-512.png",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "artifactName": "Teleprompter-Setup-Windows-${arch}.${ext}"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity",
+      "icon": "../public/icon-512.png",
+      "identity": "-",
+      "artifactName": "Teleprompter-Setup-macOS-${arch}.${ext}"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Utility",
+      "icon": "../public/icon-512.png",
+      "artifactName": "Teleprompter-Setup-Linux-${arch}.${ext}"
+    }
+  }
+}
